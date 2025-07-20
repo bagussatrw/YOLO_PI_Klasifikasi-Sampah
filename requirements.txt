@@ -175,8 +175,8 @@ tenacity==9.1.2
 tldextract==5.3.0
 toml==0.10.2
 torch
-torchaudio==2.7.0+cu128
-torchvision==0.22.0+cu128
+torchaudio==2.7.0
+torchvision==0.22.0
 tornado==6.5.1
 tqdm==4.67.1
 typing-inspection==0.4.0
