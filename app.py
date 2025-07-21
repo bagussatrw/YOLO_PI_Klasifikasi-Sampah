@@ -1,12 +1,3 @@
-# ==============================================================================
-#  APLIKASI DETEKSI SAMPAH REAL-TIME DENGAN STREAMLIT & WEBRTC
-# ==============================================================================
-#  Penulis: Gemini (Asisten Riset Virtual Anda)
-#  Tujuan: Membuat antarmuka web canggih untuk deteksi sampah real-time
-#           menggunakan teknologi WebRTC untuk streaming video yang mulus.
-# ==============================================================================
-
-# --- Import Library yang Dibutuhkan ---
 import streamlit as st
 from ultralytics import YOLO
 import cv2
@@ -16,21 +7,17 @@ import numpy as np
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
 import av
 
-# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
     page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
-# --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
 st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
-# --- Sidebar untuk Opsi dan Informasi ---
 st.sidebar.header("Pengaturan")
 
-# --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
 def load_yolo_model(model_path):
     try:
@@ -40,25 +27,20 @@ def load_yolo_model(model_path):
         st.error(f"Gagal memuat model: {e}")
         return None
 
-# --- Path ke file model 'best.pt' ---
 MODEL_PATH = 'best.pt'
 
-# --- Muat Model ---
 model = load_yolo_model(MODEL_PATH)
 
 if not model:
     st.stop()
 
-# Dapatkan nama kelas dari model
 CLASS_NAMES = model.names
 
-# --- Pilihan Mode di Sidebar ---
 app_mode = st.sidebar.radio(
     "Pilih Mode Aplikasi",
     ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Real-Time (Webcam)"]
 )
 
-# --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
     "Tingkat Keyakinan Deteksi", 
     min_value=0.0, 
@@ -67,11 +49,7 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
-# ==============================================================================
-# --- Logika untuk Setiap Mode Aplikasi ---
-# ==============================================================================
 
-# --- Mode: Tentang Aplikasi ---
 if app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
@@ -86,7 +64,6 @@ if app_mode == "Tentang Aplikasi":
         """
     )
 
-# --- Mode: Deteksi dari Gambar ---
 elif app_mode == "Deteksi dari Gambar":
     st.header("Unggah Gambar untuk Deteksi")
     uploaded_file = st.file_uploader("Pilih sebuah gambar...", type=["jpg", "jpeg", "png"])
@@ -119,34 +96,26 @@ elif app_mode == "Deteksi dari Gambar":
         else:
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
-# --- Mode: Deteksi Real-Time (Webcam) ---
 elif app_mode == "Deteksi Real-Time (Webcam)":
     st.header("Deteksi Real-Time Menggunakan WebRTC")
     st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
-    # Class untuk memproses setiap frame video
     class YOLOVideoProcessor(VideoProcessorBase):
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
-            # Ubah frame ke format yang bisa digunakan OpenCV
             image = frame.to_ndarray(format="bgr24")
 
-            # Lakukan deteksi
             results = model.predict(image, conf=confidence_threshold)
             
-            # Gambar hasil deteksi di atas frame
             annotated_frame = results[0].plot()
 
-            # Kembalikan frame yang sudah dianotasi
             return av.VideoFrame.from_ndarray(annotated_frame, format="bgr24")
 
-    # Jalankan komponen WebRTC Streamer
     webrtc_streamer(
         key="yolo-webrtc",
         mode=WebRtcMode.SENDRECV,
         video_processor_factory=YOLOVideoProcessor,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True,
-        # Konfigurasi STUN server untuk membantu koneksi
         rtc_configuration={
             "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
         }
