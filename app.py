@@ -1,28 +1,30 @@
 # ==============================================================================
-#  NAMA FILE: app_stable.py
-#  VERSI: Stabil (Ambil Foto)
-#  DESKRIPSI: Menggunakan st.camera_input. Dijamin berfungsi di semua
-#             jaringan, tetapi tidak real-time streaming. Gunakan ini sebagai
-#             rencana cadangan jika versi WebRTC gagal.
+#  NAMA FILE: app_webrtc.py
+#  VERSI: Real-Time Streaming (Canggih)
+#  DESKRIPSI: Menggunakan streamlit-webrtc untuk pengalaman deteksi yang
+#             sangat mulus. Mungkin tidak berfungsi di beberapa jaringan
+#             yang ketat (kampus/kantor).
 # ==============================================================================
 
 import streamlit as st
 from ultralytics import YOLO
-import cv2
 import os
 from PIL import Image
 import numpy as np
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
+import av
+import cv2
 
 # --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
-    page_title="Deteksi Sampah Canggih",
+    page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
 # --- Judul dan Deskripsi Aplikasi ---
-st.title("♻️ Aplikasi Deteksi Sampah Canggih")
-st.write("Aplikasi ini menggunakan model YOLO untuk mendeteksi sampah. Pilih mode deteksi di sidebar.")
+st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
+st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
 # --- Sidebar untuk Opsi dan Informasi ---
 st.sidebar.header("Pengaturan")
@@ -52,7 +54,7 @@ CLASS_NAMES = model.names
 # --- Pilihan Mode di Sidebar ---
 app_mode = st.sidebar.radio(
     "Pilih Mode Aplikasi",
-    ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Langsung dari Kamera"]
+    ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Real-Time (Webcam)"]
 )
 
 # --- Slider untuk Confidence Threshold ---
@@ -72,13 +74,13 @@ if app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
-        Aplikasi ini adalah sebuah prototipe yang dibuat untuk **Penulisan Ilmiah** dengan tujuan mendemonstrasikan penerapan *Computer Vision* menggunakan model **YOLO (You Only Look Once)**.
+        Aplikasi ini adalah prototipe canggih yang menggunakan **YOLO** untuk deteksi objek dan **Streamlit-WebRTC** untuk streaming video real-time.
         
         **Fitur Utama:**
-        - **Deteksi Langsung:** Mampu mendeteksi objek sampah langsung dari kamera perangkat (desktop maupun mobile).
+        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif, layaknya video call.
         - **Deteksi dari Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
         - **Klasifikasi Objek:** Model dilatih untuk membedakan antara sampah **organik** dan **anorganik**.
-        - **Pengaturan Fleksibel:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi melalui slider di sidebar.
+        - **Pengaturan Fleksibel:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
         """
     )
 
@@ -114,35 +116,28 @@ elif app_mode == "Deteksi dari Gambar":
         else:
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
-elif app_mode == "Deteksi Langsung dari Kamera":
-    st.header("Deteksi Langsung dari Kamera")
-    
-    picture = st.camera_input("Arahkan kamera ke objek, lalu klik tombol 'Take Photo'")
+elif app_mode == "Deteksi Real-Time (Webcam)":
+    st.header("Deteksi Real-Time Menggunakan WebRTC")
+    st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
-    if picture is not None:
-        image = Image.open(picture)
-        image_np_rgb = np.array(image)
-        image_np_bgr = cv2.cvtColor(image_np_rgb, cv2.COLOR_RGB2BGR)
+    class YOLOVideoProcessor(VideoProcessorBase):
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            image = frame.to_ndarray(format="bgr24")
+            results = model.predict(image, conf=confidence_threshold)
+            annotated_frame = results[0].plot()
+            return av.VideoFrame.from_ndarray(annotated_frame, format="bgr24")
 
-        results = model.predict(image_np_bgr, conf=confidence_threshold)
-        annotated_image_bgr = results[0].plot()
-        annotated_image_rgb = cv2.cvtColor(annotated_image_bgr, cv2.COLOR_BGR2RGB)
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(image, caption="Gambar yang Diambil", use_container_width=True)
-        with col2:
-            st.image(annotated_image_rgb, caption="Gambar Hasil Deteksi", use_container_width=True)
-
-        st.subheader("Ringkasan Hasil Deteksi")
-        if len(results[0].boxes) > 0:
-            detection_counts = {}
-            for box in results[0].boxes:
-                class_id = int(box.cls)
-                class_name = CLASS_NAMES[class_id]
-                detection_counts[class_name] = detection_counts.get(class_name, 0) + 1
-            
-            for class_name, count in detection_counts.items():
-                st.write(f"- Ditemukan **{count}** objek **{class_name}**")
-        else:
-            st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
+    webrtc_streamer(
+        key="yolo-webrtc",
+        mode=WebRtcMode.SENDRECV,
+        video_processor_factory=YOLOVideoProcessor,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
+        rtc_configuration={
+            "iceServers": [
+                {"urls": ["stun:stun.l.google.com:19302"]},
+                {"urls": ["stun:stun1.l.google.com:19302"]},
+                {"urls": ["stun:stun2.l.google.com:19302"]},
+            ]
+        }
+    )
