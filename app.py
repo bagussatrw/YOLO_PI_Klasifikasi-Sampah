@@ -1,9 +1,8 @@
 # ==============================================================================
-#  NAMA FILE: app_webrtc.py
-#  VERSI: Real-Time Streaming (Canggih)
-#  DESKRIPSI: Menggunakan streamlit-webrtc untuk pengalaman deteksi yang
-#             sangat mulus. Mungkin tidak berfungsi di beberapa jaringan
-#             yang ketat (kampus/kantor).
+#  NAMA FILE: app_webrtc_turn.py
+#  VERSI: Real-Time Streaming dengan TURN Server (Untuk Jaringan Ketat)
+#  DESKRIPSI: Versi ini menambahkan TURN server gratis untuk meningkatkan
+#             kemungkinan keberhasilan koneksi di jaringan yang restriktif.
 # ==============================================================================
 
 import streamlit as st
@@ -135,15 +134,19 @@ elif app_mode == "Deteksi Real-Time (Webcam)":
         async_processing=True,
         rtc_configuration={
             "iceServers": [
+                # STUN server tetap ada sebagai pilihan pertama
                 {"urls": ["stun:stun.l.google.com:19302"]},
                 {"urls": ["stun:stun1.l.google.com:19302"]},
                 {"urls": ["stun:stun2.l.google.com:19302"]},
+                {"urls": ["stun:stun3.l.google.com:19302"]},
+                {"urls": ["stun:stun4.l.google.com:19302"]},
                 
-               {    
+                # DITAMBAHKAN: Konfigurasi TURN server gratis dari daftar
+                {
                     "urls": ["turn:openrelay.metered.ca:80"],
                     "username": "openrelayproject",
                     "credential": "openrelayproject",
                 },
-        ]
-    }
-)
+            ]
+        }
+    )
