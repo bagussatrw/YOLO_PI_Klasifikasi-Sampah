@@ -40,7 +40,7 @@ st.sidebar.subheader("Pilih Mode")
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = "Tentang Aplikasi" # Mode default
 
-if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
+if st.sidebar.button("Home", use_container_width=True):
     st.session_state.app_mode = "Tentang Aplikasi"
 if st.sidebar.button("Deteksi Gambar", use_container_width=True):
     st.session_state.app_mode = "Deteksi Gambar"
