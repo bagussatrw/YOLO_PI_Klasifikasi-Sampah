@@ -53,8 +53,8 @@ if 'app_mode' not in st.session_state:
 # DIGANTI: Menggunakan tombol untuk memilih mode
 if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
     st.session_state.app_mode = "Tentang Aplikasi"
-if st.sidebar.button("Deteksi dari Gambar", use_container_width=True):
-    st.session_state.app_mode = "Deteksi dari Gambar"
+if st.sidebar.button("Deteksi Gambar", use_container_width=True):
+    st.session_state.app_mode = "Deteksi Gambar"
 if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
     st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
 
@@ -77,13 +77,12 @@ if st.session_state.app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
-        Aplikasi ini adalah prototipe canggih yang menggunakan **YOLO** untuk deteksi objek dan **Streamlit-WebRTC** untuk streaming video real-time.
         
         **Fitur Utama:**
-        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif, layaknya video call.
-        - **Deteksi dari Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
-        - **Klasifikasi Objek:** Model dilatih untuk membedakan antara sampah **organik** dan **anorganik**.
-        - **Pengaturan Fleksibel:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
+        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif.
+        - **Deteksi Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
+        - **Klasifikasi Jenis Sampah:** Model dilatih untuk mengklasifikasikan antara sampah **organik** dan **anorganik**.
+        - **Mengatur Tingkat Keyakinan:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
         """
     )
 
@@ -121,7 +120,7 @@ elif st.session_state.app_mode == "Deteksi dari Gambar":
 
 elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
     st.header("Deteksi Real-Time Menggunakan WebRTC")
-    st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
+    st.write("Klik 'START' untuk menyalakan kamera.")
 
     class YOLOVideoProcessor(VideoProcessorBase):
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
