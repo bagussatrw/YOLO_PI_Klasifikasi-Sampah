@@ -7,21 +7,16 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
 import av
 import cv2
 
-# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
     page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
-# --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
-st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
-# --- Sidebar untuk Opsi dan Informasi ---
-st.sidebar.header("Pengaturan")
+st.sidebar.header("Menu")
 
-# --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
 def load_yolo_model(model_path):
     try:
@@ -31,26 +26,20 @@ def load_yolo_model(model_path):
         st.error(f"Gagal memuat model: {e}")
         return None
 
-# --- Path ke file model 'best.pt' ---
 MODEL_PATH = 'best.pt'
 
-# --- Muat Model ---
 model = load_yolo_model(MODEL_PATH)
 
 if not model:
     st.stop()
 
-# Dapatkan nama kelas dari model
 CLASS_NAMES = model.names
 
-# --- Pilihan Mode di Sidebar ---
-st.sidebar.subheader("Pilih Mode Aplikasi")
+st.sidebar.subheader("Pilih Mode")
 
-# Inisialisasi session_state untuk mode aplikasi
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = "Tentang Aplikasi" # Mode default
 
-# DIGANTI: Menggunakan tombol untuk memilih mode
 if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
     st.session_state.app_mode = "Tentang Aplikasi"
 if st.sidebar.button("Deteksi Gambar", use_container_width=True):
@@ -58,9 +47,8 @@ if st.sidebar.button("Deteksi Gambar", use_container_width=True):
 if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
     st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
 
-st.sidebar.divider() # Garis pemisah
+st.sidebar.divider() 
 
-# --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
     "Tingkat Keyakinan Deteksi", 
     min_value=0.0, 
@@ -69,9 +57,6 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
-# ==============================================================================
-# --- Logika untuk Setiap Mode Aplikasi ---
-# ==============================================================================
 
 if st.session_state.app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
