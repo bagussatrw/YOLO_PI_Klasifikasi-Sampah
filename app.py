@@ -1,4 +1,3 @@
-
 import streamlit as st
 from ultralytics import YOLO
 import os
@@ -8,17 +7,21 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
 import av
 import cv2
 
+# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
     page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
+# --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
 st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
+# --- Sidebar untuk Opsi dan Informasi ---
 st.sidebar.header("Pengaturan")
 
+# --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
 def load_yolo_model(model_path):
     try:
@@ -28,20 +31,36 @@ def load_yolo_model(model_path):
         st.error(f"Gagal memuat model: {e}")
         return None
 
+# --- Path ke file model 'best.pt' ---
 MODEL_PATH = 'best.pt'
 
+# --- Muat Model ---
 model = load_yolo_model(MODEL_PATH)
 
 if not model:
     st.stop()
 
+# Dapatkan nama kelas dari model
 CLASS_NAMES = model.names
 
-app_mode = st.sidebar.radio(
-    "Pilih Mode Aplikasi",
-    ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Real-Time (Webcam)"]
-)
+# --- Pilihan Mode di Sidebar ---
+st.sidebar.subheader("Pilih Mode Aplikasi")
 
+# Inisialisasi session_state untuk mode aplikasi
+if 'app_mode' not in st.session_state:
+    st.session_state.app_mode = "Tentang Aplikasi" # Mode default
+
+# DIGANTI: Menggunakan tombol untuk memilih mode
+if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
+    st.session_state.app_mode = "Tentang Aplikasi"
+if st.sidebar.button("Deteksi dari Gambar", use_container_width=True):
+    st.session_state.app_mode = "Deteksi dari Gambar"
+if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
+    st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
+
+st.sidebar.divider() # Garis pemisah
+
+# --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
     "Tingkat Keyakinan Deteksi", 
     min_value=0.0, 
@@ -50,9 +69,11 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
+# ==============================================================================
+# --- Logika untuk Setiap Mode Aplikasi ---
+# ==============================================================================
 
-
-if app_mode == "Tentang Aplikasi":
+if st.session_state.app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
@@ -66,7 +87,7 @@ if app_mode == "Tentang Aplikasi":
         """
     )
 
-elif app_mode == "Deteksi dari Gambar":
+elif st.session_state.app_mode == "Deteksi dari Gambar":
     st.header("Unggah Gambar untuk Deteksi")
     uploaded_file = st.file_uploader("Pilih sebuah gambar...", type=["jpg", "jpeg", "png"])
 
@@ -98,7 +119,7 @@ elif app_mode == "Deteksi dari Gambar":
         else:
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
-elif app_mode == "Deteksi Real-Time (Webcam)":
+elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
     st.header("Deteksi Real-Time Menggunakan WebRTC")
     st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
@@ -118,11 +139,6 @@ elif app_mode == "Deteksi Real-Time (Webcam)":
         rtc_configuration={
             "iceServers": [
                 {"urls": ["stun:stun.l.google.com:19302"]},
-                {"urls": ["stun:stun1.l.google.com:19302"]},
-                {"urls": ["stun:stun2.l.google.com:19302"]},
-                {"urls": ["stun:stun3.l.google.com:19302"]},
-                {"urls": ["stun:stun4.l.google.com:19302"]},
-                
                 {
                     "urls": ["turn:openrelay.metered.ca:80"],
                     "username": "openrelayproject",
