@@ -1,9 +1,3 @@
-# ==============================================================================
-#  NAMA FILE: app_webrtc_turn.py
-#  VERSI: Real-Time Streaming dengan TURN Server (Untuk Jaringan Ketat)
-#  DESKRIPSI: Versi ini menambahkan TURN server gratis untuk meningkatkan
-#             kemungkinan keberhasilan koneksi di jaringan yang restriktif.
-# ==============================================================================
 
 import streamlit as st
 from ultralytics import YOLO
@@ -14,21 +8,17 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
 import av
 import cv2
 
-# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
     page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
-# --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
 st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
-# --- Sidebar untuk Opsi dan Informasi ---
 st.sidebar.header("Pengaturan")
 
-# --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
 def load_yolo_model(model_path):
     try:
@@ -38,25 +28,20 @@ def load_yolo_model(model_path):
         st.error(f"Gagal memuat model: {e}")
         return None
 
-# --- Path ke file model 'best.pt' ---
 MODEL_PATH = 'best.pt'
 
-# --- Muat Model ---
 model = load_yolo_model(MODEL_PATH)
 
 if not model:
     st.stop()
 
-# Dapatkan nama kelas dari model
 CLASS_NAMES = model.names
 
-# --- Pilihan Mode di Sidebar ---
 app_mode = st.sidebar.radio(
     "Pilih Mode Aplikasi",
     ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Real-Time (Webcam)"]
 )
 
-# --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
     "Tingkat Keyakinan Deteksi", 
     min_value=0.0, 
@@ -65,9 +50,7 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
-# ==============================================================================
-# --- Logika untuk Setiap Mode Aplikasi ---
-# ==============================================================================
+
 
 if app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
@@ -134,14 +117,12 @@ elif app_mode == "Deteksi Real-Time (Webcam)":
         async_processing=True,
         rtc_configuration={
             "iceServers": [
-                # STUN server tetap ada sebagai pilihan pertama
                 {"urls": ["stun:stun.l.google.com:19302"]},
                 {"urls": ["stun:stun1.l.google.com:19302"]},
                 {"urls": ["stun:stun2.l.google.com:19302"]},
                 {"urls": ["stun:stun3.l.google.com:19302"]},
                 {"urls": ["stun:stun4.l.google.com:19302"]},
                 
-                # DITAMBAHKAN: Konfigurasi TURN server gratis dari daftar
                 {
                     "urls": ["turn:openrelay.metered.ca:80"],
                     "username": "openrelayproject",
