@@ -58,7 +58,7 @@ confidence_threshold = st.sidebar.slider(
 )
 
 
-if st.session_state.app_mode == "Tentang Aplikasi":
+if st.session_state.app_mode == "Home":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
