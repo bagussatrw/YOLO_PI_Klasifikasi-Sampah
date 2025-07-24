@@ -1,8 +1,8 @@
 # ==============================================================================
 #  NAMA FILE: app_webrtc_turn.py
-#  VERSI: Real-Time Streaming dengan Tombol Mode
-#  DESKRIPSI: Versi ini mengganti radio button di sidebar dengan tombol-tombol
-#             terpisah untuk memilih mode aplikasi.
+#  VERSI: Real-Time Streaming dengan TURN Server (Untuk Jaringan Ketat)
+#  DESKRIPSI: Versi ini menambahkan TURN server gratis untuk meningkatkan
+#             kemungkinan keberhasilan koneksi di jaringan yang restriktif.
 # ==============================================================================
 
 import streamlit as st
@@ -51,21 +51,10 @@ if not model:
 CLASS_NAMES = model.names
 
 # --- Pilihan Mode di Sidebar ---
-st.sidebar.subheader("Pilih Mode Aplikasi")
-
-# Inisialisasi session_state untuk mode aplikasi
-if 'app_mode' not in st.session_state:
-    st.session_state.app_mode = "Tentang Aplikasi" # Mode default
-
-# DIGANTI: Menggunakan tombol untuk memilih mode
-if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
-    st.session_state.app_mode = "Tentang Aplikasi"
-if st.sidebar.button("Deteksi dari Gambar", use_container_width=True):
-    st.session_state.app_mode = "Deteksi dari Gambar"
-if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
-    st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
-
-st.sidebar.divider() # Garis pemisah
+app_mode = st.sidebar.radio(
+    "Pilih Mode Aplikasi",
+    ["Tentang Aplikasi", "Deteksi dari Gambar", "Deteksi Real-Time (Webcam)"]
+)
 
 # --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
@@ -80,7 +69,7 @@ confidence_threshold = st.sidebar.slider(
 # --- Logika untuk Setiap Mode Aplikasi ---
 # ==============================================================================
 
-if st.session_state.app_mode == "Tentang Aplikasi":
+if app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
@@ -94,7 +83,7 @@ if st.session_state.app_mode == "Tentang Aplikasi":
         """
     )
 
-elif st.session_state.app_mode == "Deteksi dari Gambar":
+elif app_mode == "Deteksi dari Gambar":
     st.header("Unggah Gambar untuk Deteksi")
     uploaded_file = st.file_uploader("Pilih sebuah gambar...", type=["jpg", "jpeg", "png"])
 
@@ -126,7 +115,7 @@ elif st.session_state.app_mode == "Deteksi dari Gambar":
         else:
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
-elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
+elif app_mode == "Deteksi Real-Time (Webcam)":
     st.header("Deteksi Real-Time Menggunakan WebRTC")
     st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
@@ -145,23 +134,15 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         async_processing=True,
         rtc_configuration={
             "iceServers": [
+                # STUN server tetap ada sebagai pilihan pertama
                 {"urls": ["stun:stun.l.google.com:19302"]},
-                # DIGANTI: Menggunakan server TURN gratis dari Open Relay Project
+                
+                # DITAMBAHKAN: Konfigurasi TURN server gratis dari daftar
                 {
                     "urls": ["turn:openrelay.metered.ca:80"],
                     "username": "openrelayproject",
                     "credential": "openrelayproject",
                 },
-                 {
-                    "urls": ["turn:openrelay.metered.ca:443"],
-                    "username": "openrelayproject",
-                    "credential": "openrelayproject",
-                },
-                {
-                    "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
-                    "username": "openrelayproject",
-                    "credential": "openrelayproject",
-                }
             ]
         }
     )
