@@ -137,7 +137,7 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
             annotated_frame = results[0].plot()
             return av.VideoFrame.from_ndarray(annotated_frame, format="bgr24")
 
-    webrtc_streamer(
+   webrtc_streamer(
         key="yolo-webrtc",
         mode=WebRtcMode.SENDRECV,
         video_processor_factory=YOLOVideoProcessor,
@@ -146,11 +146,9 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         rtc_configuration={
             "iceServers": [
                 {"urls": ["stun:stun.l.google.com:19302"]},
-                # DIGANTI: Menggunakan server TURN gratis alternatif
+                # DIGANTI: Menggunakan server TURN gratis alternatif dari pjsip.org
                 {
-                    "urls": ["turn:numb.viagenie.ca:3478"],
-                    "username": "webrtc@live.com",
-                    "credential": "muazkh",
+                    "urls": ["turn:turn.pjsip.org"],
                 },
             ]
         }
