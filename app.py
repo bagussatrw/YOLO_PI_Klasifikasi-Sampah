@@ -146,9 +146,11 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         rtc_configuration={
             "iceServers": [
                 {"urls": ["stun:stun.l.google.com:19302"]},
-                # DIGANTI: Menggunakan server TURN gratis alternatif dari pjsip.org
+                # DIGANTI: Menggunakan server TURN gratis yang menyertakan username & credential
                 {
-                    "urls": ["turn:turn.pjsip.org"],
+                    "urls": ["turn:numb.viagenie.ca:3478"],
+                    "username": "webrtc@live.com",
+                    "credential": "muazkh",
                 },
             ]
         }
