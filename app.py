@@ -143,14 +143,14 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
             video_processor_factory=YOLOVideoProcessor,
             media_stream_constraints={"video": True, "audio": False},
             async_processing=True,
-            # DIGANTI: Menggunakan kombinasi STUN/TURN gratis dari daftar GitHub
+            # DIGANTI: Menggunakan server dari turn.bistri.com
             rtc_configuration={
                 "iceServers": [
                     {"urls": ["stun:stun.l.google.com:19302"]},
                     {
-                        "urls": ["turn:turn.anyfirewall.com:443?transport=tcp"],
-                        "username": "webrtc",
-                        "credential": "webrtc",
+                        "urls": ["turn:openrelay.metered.ca:80"],
+                        "username": "openrelayproject",
+                        "credential": "openrelayproject",
                     },
                 ]
             }
