@@ -1,3 +1,10 @@
+# ==============================================================================
+#  NAMA FILE: app_webrtc_turn.py
+#  VERSI: Real-Time Streaming dengan Tombol Mode
+#  DESKRIPSI: Versi ini mengganti radio button di sidebar dengan tombol-tombol
+#             terpisah untuk memilih mode aplikasi.
+# ==============================================================================
+
 import streamlit as st
 from ultralytics import YOLO
 import os
@@ -7,16 +14,21 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
 import av
 import cv2
 
+# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(
     page_title="Deteksi Sampah Real-Time",
     page_icon="♻️",
     layout="wide"
 )
 
+# --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
+st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
-st.sidebar.header("Menu")
+# --- Sidebar untuk Opsi dan Informasi ---
+st.sidebar.header("Pengaturan")
 
+# --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
 def load_yolo_model(model_path):
     try:
@@ -26,29 +38,36 @@ def load_yolo_model(model_path):
         st.error(f"Gagal memuat model: {e}")
         return None
 
+# --- Path ke file model 'best.pt' ---
 MODEL_PATH = 'best.pt'
 
+# --- Muat Model ---
 model = load_yolo_model(MODEL_PATH)
 
 if not model:
     st.stop()
 
+# Dapatkan nama kelas dari model
 CLASS_NAMES = model.names
 
-st.sidebar.subheader("Pilih Mode")
+# --- Pilihan Mode di Sidebar ---
+st.sidebar.subheader("Pilih Mode Aplikasi")
 
+# Inisialisasi session_state untuk mode aplikasi
 if 'app_mode' not in st.session_state:
     st.session_state.app_mode = "Tentang Aplikasi" # Mode default
 
-if st.sidebar.button("Home", use_container_width=True):
+# DIGANTI: Menggunakan tombol untuk memilih mode
+if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
     st.session_state.app_mode = "Tentang Aplikasi"
-if st.sidebar.button("Deteksi Gambar", use_container_width=True):
+if st.sidebar.button("Deteksi dari Gambar", use_container_width=True):
     st.session_state.app_mode = "Deteksi dari Gambar"
 if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
     st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
 
-st.sidebar.divider() 
+st.sidebar.divider() # Garis pemisah
 
+# --- Slider untuk Confidence Threshold ---
 confidence_threshold = st.sidebar.slider(
     "Tingkat Keyakinan Deteksi", 
     min_value=0.0, 
@@ -57,17 +76,21 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
+# ==============================================================================
+# --- Logika untuk Setiap Mode Aplikasi ---
+# ==============================================================================
 
 if st.session_state.app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
+        Aplikasi ini adalah prototipe canggih yang menggunakan **YOLO** untuk deteksi objek dan **Streamlit-WebRTC** untuk streaming video real-time.
         
         **Fitur Utama:**
-        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif.
-        - **Deteksi Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
-        - **Klasifikasi Jenis Sampah:** Model dilatih untuk mengklasifikasikan antara sampah **organik** dan **anorganik**.
-        - **Mengatur Tingkat Keyakinan:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
+        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif, layaknya video call.
+        - **Deteksi dari Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
+        - **Klasifikasi Objek:** Model dilatih untuk membedakan antara sampah **organik** dan **anorganik**.
+        - **Pengaturan Fleksibel:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
         """
     )
 
@@ -104,8 +127,8 @@ elif st.session_state.app_mode == "Deteksi dari Gambar":
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
 elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
-    st.header("Deteksi Real-Time Menggunakan Kamera")
-    st.write("Klik 'START' untuk menyalakan kamera.")
+    st.header("Deteksi Real-Time Menggunakan WebRTC")
+    st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
     class YOLOVideoProcessor(VideoProcessorBase):
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
@@ -123,10 +146,11 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         rtc_configuration={
             "iceServers": [
                 {"urls": ["stun:stun.l.google.com:19302"]},
+                # DIGANTI: Menggunakan server TURN gratis alternatif
                 {
-                    "urls": ["turn:openrelay.metered.ca:80"],
-                    "username": "openrelayproject",
-                    "credential": "openrelayproject",
+                    "urls": ["turn:numb.viagenie.ca:3478"],
+                    "username": "webrtc@live.com",
+                    "credential": "muazkh",
                 },
             ]
         }
