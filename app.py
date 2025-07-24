@@ -156,11 +156,11 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         async_processing=True,
         rtc_configuration={
             "iceServers": [
-                {"urls": ["stun:stun.l.google.com:19302"]},
+                {"urls": ["stun:freestun.net:3478"]},
                 {
-                    "urls": ["turn:openrelay.metered.ca:80"],
-                    "username": "openrelayproject",
-                    "credential": "openrelayproject",
+                    "urls": ["turn:freestun.net:3478"],
+                    "username": "free",
+                    "credential": "free",
                 },
             ]
         }
