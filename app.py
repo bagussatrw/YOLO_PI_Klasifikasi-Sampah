@@ -21,10 +21,9 @@ st.set_page_config(
 
 # --- Judul dan Deskripsi Aplikasi ---
 st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
-st.write("Aplikasi ini menggunakan model YOLO dan teknologi WebRTC untuk deteksi sampah yang mulus. Pilih mode di sidebar.")
 
 # --- Sidebar untuk Opsi dan Informasi ---
-st.sidebar.header("Pengaturan")
+st.sidebar.header("Menu")
 
 # --- Fungsi untuk Memuat Model (dengan cache agar lebih efisien) ---
 @st.cache_resource
@@ -55,9 +54,9 @@ if 'app_mode' not in st.session_state:
 
 st.sidebar.subheader("Pilih Mode")
 # Menggunakan tombol untuk memilih mode
-if st.sidebar.button("Tentang Aplikasi", use_container_width=True):
+if st.sidebar.button("Home", use_container_width=True):
     st.session_state.app_mode = "Tentang Aplikasi"
-if st.sidebar.button("Deteksi dari Gambar", use_container_width=True):
+if st.sidebar.button("Deteksi Gambar", use_container_width=True):
     st.session_state.app_mode = "Deteksi dari Gambar"
 if st.sidebar.button("Deteksi Real-Time (Webcam)", use_container_width=True):
     st.session_state.app_mode = "Deteksi Real-Time (Webcam)"
