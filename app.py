@@ -80,10 +80,9 @@ if st.session_state.app_mode == "Tentang Aplikasi":
     st.header("Tentang Aplikasi Ini")
     st.markdown(
         """
-        Aplikasi ini adalah prototipe canggih yang menggunakan **YOLO** untuk deteksi objek dan **Streamlit-WebRTC** untuk streaming video real-time.
         
         **Fitur Utama:**
-        - **Streaming Real-Time (WebRTC):** Memberikan pengalaman deteksi yang sangat mulus dan responsif, layaknya video call.
+        - **Streaming Real-Time (WebRTC):** Dapat mendeteksi objek dan mengklasifikasikan sampah secara realtime.
         - **Deteksi dari Gambar:** Pengguna dapat mengunggah gambar untuk dianalisis.
         - **Klasifikasi Objek:** Model dilatih untuk membedakan antara sampah **organik** dan **anorganik**.
         - **Pengaturan Fleksibel:** Pengguna dapat menyesuaikan tingkat keyakinan deteksi.
