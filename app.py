@@ -146,12 +146,22 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
         rtc_configuration={
             "iceServers": [
                 {"urls": ["stun:stun.l.google.com:19302"]},
-                # DIGANTI: Menggunakan server TURN gratis yang menyertakan username & credential
+                # DIGANTI: Menggunakan server TURN gratis dari Open Relay Project
                 {
-                    "urls": ["turn:numb.viagenie.ca:3478"],
-                    "username": "webrtc@live.com",
-                    "credential": "muazkh",
+                    "urls": ["turn:openrelay.metered.ca:80"],
+                    "username": "openrelayproject",
+                    "credential": "openrelayproject",
                 },
+                 {
+                    "urls": ["turn:openrelay.metered.ca:443"],
+                    "username": "openrelayproject",
+                    "credential": "openrelayproject",
+                },
+                {
+                    "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
+                    "username": "openrelayproject",
+                    "credential": "openrelayproject",
+                }
             ]
         }
     )
