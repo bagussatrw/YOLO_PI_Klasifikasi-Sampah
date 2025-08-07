@@ -1,7 +1,3 @@
-# ==============================================================================
-#  NAMA FILE: app_webrtc_turn.py (Versi Coba Server Baru)
-#  DESKRIPSI: Menggunakan server STUN/TURN dari daftar GitHub untuk testing.
-# ==============================================================================
 
 import streamlit as st
 from ultralytics import YOLO
@@ -153,3 +149,4 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
                 ]
             }
         )
+
