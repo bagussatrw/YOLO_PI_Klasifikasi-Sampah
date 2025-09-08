@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # --- Judul dan Deskripsi Aplikasi ---
-st.title("♻️ Aplikasi Deteksi Sampah Real-Time (WebRTC)")
+st.title("♻️ Aplikasi Deteksi Sampah Real-Time")
 
 # --- Sidebar untuk Opsi dan Informasi ---
 st.sidebar.header("Menu")
@@ -149,4 +149,5 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
                 ]
             }
         )
+
 
