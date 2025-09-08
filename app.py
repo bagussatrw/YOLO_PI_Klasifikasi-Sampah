@@ -118,7 +118,7 @@ elif st.session_state.app_mode == "Deteksi dari Gambar":
             st.write("Tidak ada objek yang terdeteksi pada gambar ini.")
 
 elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
-    st.header("Deteksi Real-Time Menggunakan WebRTC")
+    st.header("Deteksi Real-Time Menggunakan Kamera")
     st.write("Klik 'START' di bawah untuk menyalakan kamera Anda.")
 
     class YOLOVideoProcessor(VideoProcessorBase):
@@ -149,3 +149,4 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
                 ]
             }
         )
+
