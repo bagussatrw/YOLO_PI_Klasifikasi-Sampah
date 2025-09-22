@@ -127,29 +127,28 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
             results = model.predict(image, conf=confidence_threshold)
             annotated_frame = results[0].plot()
             return av.VideoFrame.from_ndarray(annotated_frame, format="bgr24")
-
-    # Menggunakan kolom untuk membatasi lebar video
+# Menggunakan kolom untuk membatasi lebar video
     col1, col2, col3 = st.columns([1, 2, 1]) # Membuat 3 kolom, video akan di tengah
     with col2: # Meletakkan video di kolom tengah
         webrtc_streamer(
-            key="yolo-webrtc-updated",
+            key="yolo-webrtc",
             mode=WebRtcMode.SENDRECV,
             video_processor_factory=YOLOVideoProcessor,
             media_stream_constraints={"video": True, "audio": False},
             async_processing=True,
+            # DIGANTI: Menggunakan server dari turn.bistri.com
             rtc_configuration={
                 "iceServers": [
                     {"urls": ["stun:stun.l.google.com:19302"]},
-                    {"urls": ["stun:stun1.l.google.com:19302"]},
-                    {"urls": ["stun:stun2.l.google.com:19302"]},
                     {
-                    "urls": ["turn:openrelay.metered.ca:80"],
-                    "username": "openrelayproject",
-                    "credential": "openrelayproject",
+                        "urls": ["turn:openrelay.metered.ca:80"],
+                        "username": "openrelayproject",
+                        "credential": "openrelayproject",
                     },
                 ]
             }
         )
+
 
 
 
