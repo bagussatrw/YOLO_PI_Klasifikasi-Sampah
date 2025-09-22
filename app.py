@@ -129,8 +129,7 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
             return av.VideoFrame.from_ndarray(annotated_frame, format="bgr24")
 
     # Menggunakan kolom untuk membatasi lebar video
-    col1, col2, col3 = st.columns([1, 2, 1]) # Membuat 3 kolom, video akan di tengah
-    with col2: # Meletakkan video di kolom tengah
+
         webrtc_streamer(
             key="yolo-webrtc-updated",
             mode=WebRtcMode.SENDRECV,
@@ -150,6 +149,7 @@ elif st.session_state.app_mode == "Deteksi Real-Time (Webcam)":
                 ]
             }
         )
+
 
 
 
